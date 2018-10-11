@@ -56,9 +56,30 @@ Métriques et tendances
 Entrons maintenant dans le vif du sujet: le calcul de métriques et de
 tendances diverses dans des flux d'événements.
 
-### Moyenne coulissante
+### Nombres d'occurrences
 
-TODO
+On considère un log généré par l'exécution d'un serveur web Apache (le fichier
+`access_log` qui se trouve dans
+[cette archive](http://www.monitorware.com/en/logsamples/download/apache-samples.rar).
+Une ligne de ce fichier ressemble à ceci:
+
+    64.242.88.10 - - [07/Mar/2004:16:35:19 -0800] "GET /mailman/listinfo/business HTTP/1.1" 200 6379
+
+La fonction `GetIp` (dans le dépôt des exercices) peut extraire l'adresse IP
+(premier champ) de ces lignes de logs.
+
+1. Créez une chaîne de processeurs qui, à partir des lignes du log, accumule
+les adresses IP trouvées dans un ensemble (vous aurez besoin de
+[`PutInto`](https://liflab.gitbook.io/event-stream-processing-with-beepbeep-3/advanced#set-specific-objects)).
+
+2. Utilisez le processeur `TrendDistance` pour vérifier que, dans toute
+fenêtre de 50 lignes consécutives, il y a au minimum 1 et au maximum 4
+adresses distinctes.
+  - Dans cet exemple, quelle est la tendance de référence?
+  - Quelle est la fonction de distance?
+  - Quelle est la fonction de comparaison?
+  - Quelle est la largeur de la fenêtre?
+  - Quel est le seuil (*threshold*)?
 
 ### Loi de Benford
 
@@ -93,13 +114,46 @@ longueur de la fenêtre? Expérimentez avec d'autres suites de nombres, comme la
 suite des carrés (1, 2, 4, 9, ...) ou la
 [suite de Fibonacci](https://fr.wikipedia.org/wiki/Suite_de_Fibonacci).
 
+### Clustering
+
+On considère une version "synthétique" d'un log tiré d'un pare-feu
+[Cisco PIX](https://fr.wikipedia.org/wiki/Cisco_PIX). En particulier, on
+s'intéresse aux connexions UDP, et en particulier à leur
+durée. Le début d'une connexion est représenté par une ligne comme celle-ci:
+
+    Mar 29 2004 09:54:18: %PIX-6-302005: Built UDP connection for faddr 198.207.223.240/53337 gaddr 10.0.0.187/53 laddr 192.168.0.2/53
+
+La fin d'une connection ressemble à ceci:
+
+    Mar 29 2004 09:57:06: %PIX-6-302006: Teardown UDP connection for faddr 198.207.223.240/53337 gaddr 10.0.0.187/53 laddr 192.168.0.2/53
+
+On peut déduire la durée d'une connexion en comparant les timestamps de ces
+deux lignes pour une même adresse `faddr` (ici `198.207.223.240/53337`).
+Supposons qu'un chaîne de processeurs BeepBeep fasse déjà ce pré-traitement,
+et produise un flux de durées de sessions (en secondes).
+
+On cherche à utiliser le clustering pour déterminer les durées de sessions
+types dans un ensemble trace au moyen de l'objet [ProcessorMiningFunction]().
+
+1. Écrivez une chaîne de processeurs qui, à partir d'une séquence de durées de
+sessions, accumule ces durées dans une liste
+(indice: utilisez [`Pack`](https://liflab.gitbook.io/event-stream-processing-with-beepbeep-3/advanced#list-specific-objects)).
+Ceci sera le processeur *beta* du workflow.
+
+2. Écrivez une chaîne de processeurs *alpha* qui fait ceci:
+
+
 
 Références
 ----------
 
 - [Event Stream Processing with BeepBeep 3](https://liflab.gitbook.io/event-stream-processing-with-beepbeep-3)
 - [Real-Time Data Mining on Event Streams](https://www.researchgate.net/publication/328172038)
-- Javadoc [PatTheMiner](https://liflab.github.io/PatTheMiner) (en construction)
+- [Diapositives de la présentation](https://www.slideshare.net/sylvainhalle/mining-event-streams-with-beepbeep-3)
+- Javadoc de [BeepBeep](http://liflab.github.io/beepbeep-3/javadoc) et de
+  [PatTheMiner](https://liflab.github.io/PatTheMiner) (cette dernière est en
+  construction)
+- [Exemples de code](https://liflab.github.io/beepbeep-3-examples)
 - Site du [Laboratoire d'informatique formelle](http://liflab.ca) de l'UQAC
 
 Contact
