@@ -78,7 +78,7 @@ valeur de retour.
 
 Cette information peut être utilisée pour vérifier des propriétés de sécurité
 sur l'exécution d'un programme. Le [projet Naccio](http://naccio.cs.virginia.edu/code/policy-index.html)
-liste près d'une centaines de telles propriétés. Ces propriétés peuvent être
+liste près d'une centaine de telles propriétés. Ces propriétés peuvent être
 vérifiées au moyen de chaînes de processeurs BeepBeep appropriées. Écrivez des
 chaînes prenant en entrée des lignes de texte au format décrit ci-dessus,
 produisant en sortie un flux de valeurs booléennes, et évaluant les
